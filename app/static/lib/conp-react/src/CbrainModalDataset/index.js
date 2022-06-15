@@ -11,13 +11,15 @@ const CbrainModalDataset = (props) => {
     Object.fromEntries(cbrainIds.map((pipeline) => [pipeline.title, false]))
   );
   const handleComplementMouseEnter = (e) => {
+    const id = e.target.id;
     setActiveComplementTooltips((prevActiveTooltips) => {
-      return { ...prevActiveTooltips, ...{ [e.target.key]: true } };
+      return { ...prevActiveTooltips, ...{ [id]: true } };
     });
   };
   const handleComplementMouseLeave = (e) => {
+    const id = e.target.id;
     setActiveComplementTooltips((prevActiveTooltips) => {
-      return { ...prevActiveTooltips, ...{ [e.target.key]: false } };
+      return { ...prevActiveTooltips, ...{ [id]: false } };
     });
   };
   const datasetCbrainId = cbrain_id.split("?id=")[1];
@@ -59,26 +61,29 @@ const CbrainModalDataset = (props) => {
           None
         </a>
         {cbrainIds.map((pipeline) => (
-          <>
-            <a
-              href={`${baseUrl}&${getPipelineId(pipeline.url)}`}
-              className="list-group-item list-group-item-action"
-              target="_blank"
-              rel="noreferrer"
-              key={pipeline.title}
-              onClick={finish}
-              data-tip
-            >
-              {pipeline.title}
-            </a>
-            <>
-              {activeComplementTooltips[pipeline.title] && (
-                <ReactToolTip id={`tip${pipeline.title}`} multiline={true}>
-                  {pipeline.description}
-                </ReactToolTip>
-              )}
-            </>
-          </>
+          <a
+            href={`${baseUrl}&${getPipelineId(pipeline.url)}`}
+            className="list-group-item list-group-item-action"
+            target="_blank"
+            rel="noreferrer"
+            key={pipeline.title}
+            id={pipeline.title}
+            onClick={finish}
+            onMouseOver={handleComplementMouseEnter}
+            onMouseOut={handleComplementMouseLeave}
+            data-tip={`Description: ${pipeline.description}`}
+            data-for={`tip${pipeline.title}`}
+          >
+            {pipeline.title}
+            {activeComplementTooltips[pipeline.title] && (
+              <ReactToolTip
+                id={`tip${pipeline.title}`}
+                effect="solid"
+                place="right"
+                multiline={true}
+              />
+            )}
+          </a>
         ))}
       </div>
     </div>,

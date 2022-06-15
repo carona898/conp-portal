@@ -31,8 +31,9 @@ const ElementContainer = ({ element, elementProps, complementUrl }) => {
                 url: element.platforms[0].uri,
                 id: element.id,
                 title: element.title,
+                description: element.description
               }
-            : { url: element.cbrain_id, id: element.id, title: element.title };
+            : { url: element.cbrain_id, id: element.id, title: element.title, description: element.description };
         })
       );
     } catch (err) {

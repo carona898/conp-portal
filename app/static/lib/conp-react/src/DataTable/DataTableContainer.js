@@ -73,7 +73,7 @@ const DataTableContainer = ({
       const parsed = await res.json();
 
       setCbrainIdsState(parsed.elements.map((element) => {
-        return element.platforms ? {url: element.platforms[0].uri, id: element.id, title:element.title} : {url: element.cbrain_id, id: element.id, title: element.title};
+        return element.platforms ? {url: element.platforms[0].uri, id: element.id, title:element.title, description: element.description} : {url: element.cbrain_id, id: element.id, title: element.title, description: element.description};
       }));
     }
     catch (err) {
