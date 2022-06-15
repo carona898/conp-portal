@@ -1,10 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
+import ReactToolTip from "react-tooltip";
 import PropTypes from "prop-types";
 const CbrainModalDataset = (props) => {
   const { cbrain_id, cbrainIds, title } = props;
   const finish = (event) => {
     $("#cbrainModal").modal("hide");
+  };
+  const [activeComplementTooltips, setActiveComplementTooltips] = useState(
+    Object.fromEntries(cbrainIds.map((pipeline) => [pipeline.title, false]))
+  );
+  const handleComplementMouseEnter = (e) => {
+    setActiveComplementTooltips((prevActiveTooltips) => {
+      return { ...prevActiveTooltips, ...{ [e.target.key]: true } };
+    });
+  };
+  const handleComplementMouseLeave = (e) => {
+    setActiveComplementTooltips((prevActiveTooltips) => {
+      return { ...prevActiveTooltips, ...{ [e.target.key]: false } };
+    });
   };
   const datasetCbrainId = cbrain_id.split("?id=")[1];
   const baseUrl = `https://portal.cbrain.mcgill.ca/userfiles?switch_group_id=${datasetCbrainId}`;
@@ -45,16 +59,26 @@ const CbrainModalDataset = (props) => {
           None
         </a>
         {cbrainIds.map((pipeline) => (
-          <a
-            href={`${baseUrl}&${getPipelineId(pipeline.url)}`}
-            className="list-group-item list-group-item-action"
-            target="_blank"
-            rel="noreferrer"
-            key={pipeline.title}
-            onClick={finish}
-          >
-            {pipeline.title}
-          </a>
+          <>
+            <a
+              href={`${baseUrl}&${getPipelineId(pipeline.url)}`}
+              className="list-group-item list-group-item-action"
+              target="_blank"
+              rel="noreferrer"
+              key={pipeline.title}
+              onClick={finish}
+              data-tip
+            >
+              {pipeline.title}
+            </a>
+            <>
+              {activeComplementTooltips[pipeline.title] && (
+                <ReactToolTip id={`tip${pipeline.title}`} multiline={true}>
+                  {pipeline.description}
+                </ReactToolTip>
+              )}
+            </>
+          </>
         ))}
       </div>
     </div>,
