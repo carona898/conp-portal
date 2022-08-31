@@ -37,6 +37,7 @@ Flask-Mail==0.9.1
 Flask-Migrate==2.4.0
 Flask-SQLAlchemy==2.3.2
 Flask-SSO==0.4.0
+flask_uploads==0.2.1
 Flask-User==1.0.1.5
 Flask-WTF==0.14.2
 flaskhmac==1.2.1

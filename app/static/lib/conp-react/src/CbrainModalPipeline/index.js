@@ -11,7 +11,7 @@ const CbrainModalPipeline = (props) => {
     `switch_group_id=${datasetUrl.split("?id=")[1]}`;
   useEffect(() => {
     $("#cbrainModal").modal("handleUpdate");
-    return;
+
   });
   return ReactDOM.createPortal(
     <div>
