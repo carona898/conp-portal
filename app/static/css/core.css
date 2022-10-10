@@ -439,3 +439,7 @@ Colour names courtesy of chir.ag/projects/name-that-color
 .form-group.required label::after {
   content: "*";
 }
+
+.form-btn {
+  white-space: nowrap;
+}
