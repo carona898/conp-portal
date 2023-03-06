@@ -98,3 +98,11 @@ To run the application on a Cloud9 instance:
 ### Deployment
     
 This flask application is deployed on Heroku. More information will be available soon
+
+### Docker
+
+```bash
+docker build -t conp-portal .
+docker run -d -p 4000:4000 -p 8080:8080 -v ${PWD}/app:/app/app --rm conp-portal
+docker exec -it 1e3ad5006c5a567b42575dd941e2f52837b11229090b34b1486498a3221ba69f bash -c "cd /app/app/static/v2 && yarn dev"
+```

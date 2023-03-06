@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 from flask import (
     current_app,
     flash,
@@ -15,6 +13,8 @@ from flask import (
     send_file
 )
 
+from sqlalchemy import inspect
+
 from . import experiments_bp
 from .data import data
 from .filters import get_filters
@@ -25,6 +25,12 @@ from .utils import upload_file
 from .. import config, db
 from ..models import Experiment
 
+def to_camel_case(snake_str: str):
+    components = snake_str.split('_')
+    return components[0] + ''.join(x.title() for x in components[1:])
+
+def object_as_dict(obj: object):
+    return {to_camel_case(c.key): getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 @experiments_bp.route("/")
 def home():
@@ -40,10 +46,15 @@ def download(experiment_id):
 def view(experiment_id):
     experiment = Experiment.query.filter(Experiment.id == experiment_id).first_or_404()
     experiment.increment_views()
-    return render_template("experiments/experiment.html", experiment=experiment)
+    experiment_content = {**object_as_dict(experiment), **{ "repositoryFileCount": experiment.number_repository_files, "repositorySize": experiment.size_repository_files}}
+    return render_template("experiments/experiment.html", experiment=experiment_content)
 
 @experiments_bp.route("/search")
 def search():
+    
+    experiments = [{**object_as_dict(e),**{ "repositoryFileCount": e.number_repository_files, "repositorySize": e.size_repository_files}} for e in Experiment.query.all()]
+    return render_template("experiments/search.html", experiments=experiments)
+
     filters = get_filters(request)
     page = request.args.get("page", 1, int)
     per_page = request.args.get("per_page", 10, int)
@@ -51,7 +62,7 @@ def search():
     sort_key = SortKey(request.args.get("sort_key", "title_asc", str))
 
     all_experiments = [e.__dict__ for e in Experiment.query.all()]
-    
+    print(all_experiments)
     any_active_filter = False
     ids_to_include = []
     for filter in filters:
@@ -80,6 +91,7 @@ def search():
         filters=filters,
         pagination=pagination,
         sort_key=sort_key,
+        experiments=experiments
     )
 
 @experiments_bp.route("/submit", methods=["GET", "POST"])
