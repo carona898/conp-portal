@@ -12,6 +12,16 @@ interface ExperimentCardProps {
   experiment: Experiment;
 }
 
+const getPlatformFromUrl = (url: string): string => {
+  const match = url.match(/https:\/\/(.*?)\.[a-z]+\/?/);
+  if (!match) return "";
+
+  // Capture le terme de la plateforme et met la première lettre en majuscule
+  const platform = match[1];
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
+};
+
+
 export const ExperimentCard = ({
   titleLink,
   downloadLink,
@@ -32,7 +42,9 @@ export const ExperimentCard = ({
     imageFile,
     repositoryFileCount,
     repositorySize,
-    id
+    id,
+    remoteUrl,
+    source
   }
 }: ExperimentCardProps) => {
   return (
@@ -96,12 +108,22 @@ export const ExperimentCard = ({
           </div>
         </div>
         <div className="col col-lg-3 d-flex felx-column justify-content-center align-items-center p-2">
-          <div className='row align-items-center w-100'>
+          {/* <div className='row align-items-center w-100'>
               <div className='col-10 p-0'>
                 <a className="btn btn-success m-1" role='button' href={downloadLink}>
                   Download This Experiment
                 </a>
               </div>
+          </div> */}
+          <div className="row align-items-center w-100">
+            <div className='col-10 p-0'>
+            <a className="btn btn-success mb-2" role='button' href={downloadLink}>
+              Download This Experiment
+            </a>
+            <a className="btn btn-success" role='button' href={source}>
+                View From {getPlatformFromUrl(source)}
+            </a>
+            </div>
           </div>
         </div>
       </div>
