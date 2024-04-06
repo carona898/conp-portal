@@ -11756,13 +11756,13 @@ module.exports = str => encodeURIComponent(str).replace(/[!'()*]/g, x => `%${x.c
 "use strict";
 
 var token = '%[a-f0-9]{2}';
-var singleMatcher = new RegExp(token, 'gi');
+var singleMatcher = new RegExp('(' + token + ')|([^%]+?)', 'gi');
 var multiMatcher = new RegExp('(' + token + ')+', 'gi');
 
 function decodeComponents(components, split) {
 	try {
 		// Try to decode the entire string first
-		return decodeURIComponent(components.join(''));
+		return [decodeURIComponent(components.join(''))];
 	} catch (err) {
 		// Do nothing
 	}
@@ -11784,12 +11784,12 @@ function decode(input) {
 	try {
 		return decodeURIComponent(input);
 	} catch (err) {
-		var tokens = input.match(singleMatcher);
+		var tokens = input.match(singleMatcher) || [];
 
 		for (var i = 1; i < tokens.length; i++) {
 			input = decodeComponents(tokens, i).join('');
 
-			tokens = input.match(singleMatcher);
+			tokens = input.match(singleMatcher) || [];
 		}
 
 		return input;
@@ -13398,41 +13398,36 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 
 
 
-
-
 var DataTable_DataTable = function DataTable(_ref) {
   var authorized = _ref.authorized,
-      sortKeys = _ref.sortKeys,
-      filterKeys = _ref.filterKeys,
-      elements = _ref.elements,
-      imagePath = _ref.imagePath,
-      total = _ref.total,
-      renderElement = _ref.renderElement,
-      cbrainIds = _ref.cbrainIds,
-      query = _ref.query,
-      setQuery = _ref.setQuery,
-      isLoading = _ref.isLoading;
-
+    sortKeys = _ref.sortKeys,
+    filterKeys = _ref.filterKeys,
+    elements = _ref.elements,
+    imagePath = _ref.imagePath,
+    total = _ref.total,
+    renderElement = _ref.renderElement,
+    cbrainIds = _ref.cbrainIds,
+    query = _ref.query,
+    setQuery = _ref.setQuery,
+    isLoading = _ref.isLoading;
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])([{
-    key: "modalities",
-    values: query.modalities || []
-  }, {
-    key: "formats",
-    values: query.formats || []
-  }, {
-    key: "cbrain",
-    values: query.cbrain || []
-  }, {
-    key: "authorizations",
-    values: query.authorizations || []
-  }]),
-      filters = _useState[0],
-      setFilters = _useState[1];
-
+      key: "modalities",
+      values: query.modalities || []
+    }, {
+      key: "formats",
+      values: query.formats || []
+    }, {
+      key: "cbrain",
+      values: query.cbrain || []
+    }, {
+      key: "authorizations",
+      values: query.authorizations || []
+    }]),
+    filters = _useState[0],
+    setFilters = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(query.search),
-      tempSearch = _useState2[0],
-      setTempSearch = _useState2[1];
-
+    tempSearch = _useState2[0],
+    setTempSearch = _useState2[1];
   var handleFiltersChange = function handleFiltersChange(event) {
     event.preventDefault();
     var e = event.target.value;
@@ -13464,7 +13459,6 @@ var DataTable_DataTable = function DataTable(_ref) {
       page: 1
     }));
   };
-
   var handleMaxPerPageChange = function handleMaxPerPageChange(event) {
     event.preventDefault();
     var value = event.target.value;
@@ -13474,38 +13468,30 @@ var DataTable_DataTable = function DataTable(_ref) {
       page: 1
     }));
   };
-
   var handlePageChange = function handlePageChange(event) {
     event.preventDefault();
     var page;
     var value = event.target.value;
-
     switch (value) {
       case 'first':
         page = 1;
         break;
-
       case 'back':
         page = Math.max(1, query.page - 1);
         break;
-
       case 'forward':
         page = Math.min(query.page + 1, Math.ceil(total / query.max_per_page));
         break;
-
       case 'last':
         page = Math.ceil(total / query.max_per_page);
         break;
-
       default:
         page = parseInt(value);
     }
-
     setQuery(_extends({}, query, {
       page: page
     }));
   };
-
   return isLoading ? /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", null) : /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "search-dataset-table",
     cellSpacing: 0
@@ -13793,7 +13779,7 @@ var DataTable_DataTable = function DataTable(_ref) {
     }
   }, sortKeys.map(function (_ref2, i) {
     var sortKey = _ref2.key,
-        label = _ref2.label;
+      label = _ref2.label;
     return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("option", {
       className: "dropdown-item",
       key: i,
@@ -13851,7 +13837,6 @@ var DataTable_DataTable = function DataTable(_ref) {
     onClick: handlePageChange
   }, ">>"))) : null);
 };
-
 DataTable_DataTable.propTypes = {
   authorized: prop_types_default.a.bool,
   sortKeys: prop_types_default.a.arrayOf(prop_types_default.a.shape({
@@ -13905,75 +13890,60 @@ var query_string = __webpack_require__(52);
 
 // CONCATENATED MODULE: ./src/DataTable/DataTableContainer.js
 
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 function DataTableContainer_extends() { DataTableContainer_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return DataTableContainer_extends.apply(this, arguments); }
-
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-
 
 
 
 
 var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
   var endpointURL = _ref.endpointURL,
-      complementEndpointUrl = _ref.complementEndpointUrl,
-      imagePath = _ref.imagePath,
-      limit = _ref.limit,
-      authorized = _ref.authorized,
-      total = _ref.total,
-      page = _ref.page,
-      max_per_page = _ref.max_per_page,
-      elements = _ref.elements,
-      filters = _ref.filters,
-      dataTableProps = _objectWithoutPropertiesLoose(_ref, ["endpointURL", "complementEndpointUrl", "imagePath", "limit", "authorized", "total", "page", "max_per_page", "elements", "filters"]);
-
+    complementEndpointUrl = _ref.complementEndpointUrl,
+    imagePath = _ref.imagePath,
+    limit = _ref.limit,
+    authorized = _ref.authorized,
+    total = _ref.total,
+    page = _ref.page,
+    max_per_page = _ref.max_per_page,
+    elements = _ref.elements,
+    filters = _ref.filters,
+    dataTableProps = _objectWithoutPropertiesLoose(_ref, ["endpointURL", "complementEndpointUrl", "imagePath", "limit", "authorized", "total", "page", "max_per_page", "elements", "filters"]);
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(elements),
-      fetchedElements = _useState[0],
-      setFetchedElements = _useState[1];
-
+    fetchedElements = _useState[0],
+    setFetchedElements = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])({
-    search: filters.search ? filters.search : "",
-    modalities: filters.modalities ? filters.modalities : [],
-    formats: filters.formats ? filters.formats : [],
-    sortKey: filters.sortKey ? filters.sortKey : "conpStatus",
-    sortComparitor: filters.sortComparitor ? filters.sortComparitor : "asc",
-    page: filters.page ? filters.page : 1,
-    max_per_page: filters.max_per_page ? filters.max_per_page : 10,
-    cursor: filters.cursor ? filters.cursor : 0,
-    limit: filters.limit ? filters.limit : 10
-  }),
-      query = _useState2[0],
-      setQuery = _useState2[1];
-
+      search: filters.search ? filters.search : "",
+      modalities: filters.modalities ? filters.modalities : [],
+      formats: filters.formats ? filters.formats : [],
+      sortKey: filters.sortKey ? filters.sortKey : "conpStatus",
+      sortComparitor: filters.sortComparitor ? filters.sortComparitor : "asc",
+      page: filters.page ? filters.page : 1,
+      max_per_page: filters.max_per_page ? filters.max_per_page : 10,
+      cursor: filters.cursor ? filters.cursor : 0,
+      limit: filters.limit ? filters.limit : 10
+    }),
+    query = _useState2[0],
+    setQuery = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(total),
-      totalState = _useState3[0],
-      setTotalState = _useState3[1];
-
+    totalState = _useState3[0],
+    setTotalState = _useState3[1];
   var _useState4 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      sortKeysState = _useState4[0],
-      setSortKeysState = _useState4[1];
-
+    sortKeysState = _useState4[0],
+    setSortKeysState = _useState4[1];
   var _useState5 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      filterKeysState = _useState5[0],
-      setFilterKeysState = _useState5[1];
-
+    filterKeysState = _useState5[0],
+    setFilterKeysState = _useState5[1];
   var _useState6 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(authorized),
-      authorizedState = _useState6[0],
-      setAuthorizedState = _useState6[1];
-
+    authorizedState = _useState6[0],
+    setAuthorizedState = _useState6[1];
   var _useState7 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState7[0],
-      setIsLoading = _useState7[1];
-
+    isLoading = _useState7[0],
+    setIsLoading = _useState7[1];
   var _useState8 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])([]),
-      cbrainIdsState = _useState8[0],
-      setCbrainIdsState = _useState8[1];
-
+    cbrainIdsState = _useState8[0],
+    setCbrainIdsState = _useState8[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     setQuery(DataTableContainer_extends({}, query, {
       limit: limit
@@ -13992,7 +13962,6 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
     var pathname = window.location.pathname;
     window.history.replaceState(null, null, pathname + "?" + queryString);
   }, [query]);
-
   var fetchCbrainIds = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       var url, res, parsed;
@@ -14010,21 +13979,16 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
               _context.prev = 1;
               _context.next = 4;
               return fetch(url);
-
             case 4:
               res = _context.sent;
-
               if (res.ok) {
                 _context.next = 7;
                 break;
               }
-
               throw new Error("Request failed with status: " + res.status + " (" + res.statusText + ")");
-
             case 7:
               _context.next = 9;
               return res.json();
-
             case 9:
               parsed = _context.sent;
               setCbrainIdsState(parsed.elements.map(function (element) {
@@ -14040,13 +14004,11 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
               }));
               _context.next = 17;
               break;
-
             case 13:
               _context.prev = 13;
               _context.t0 = _context["catch"](1);
               alert("There was an error populating the CBRAIN pipelines.");
               console.error(_context.t0);
-
             case 17:
             case "end":
               return _context.stop();
@@ -14054,16 +14016,13 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
         }
       }, _callee, null, [[1, 13]]);
     }));
-
     return function fetchCbrainIds() {
       return _ref2.apply(this, arguments);
     };
   }();
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchCbrainIds();
   }, []);
-
   var fetchElements = /*#__PURE__*/function () {
     var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee2() {
       var url, res, parsed;
@@ -14077,21 +14036,16 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
               _context2.prev = 1;
               _context2.next = 4;
               return fetch(url);
-
             case 4:
               res = _context2.sent;
-
               if (res.ok) {
                 _context2.next = 7;
                 break;
               }
-
               throw new Error("Request failed with status: " + res.status + " (" + res.statusText + ")");
-
             case 7:
               _context2.next = 9;
               return res.json();
-
             case 9:
               parsed = _context2.sent;
               setFetchedElements(parsed.elements);
@@ -14101,13 +14055,11 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
               setAuthorizedState(parsed.authorized);
               _context2.next = 21;
               break;
-
             case 17:
               _context2.prev = 17;
               _context2.t0 = _context2["catch"](1);
               alert("There was an error retrieving the search results.");
               console.error(_context2.t0);
-
             case 21:
               _context2.prev = 21;
               isLoading && setIsLoading(false);
@@ -14115,7 +14067,6 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
                 window.scrollTo(0, 0);
               }, 100);
               return _context2.finish(21);
-
             case 25:
             case "end":
               return _context2.stop();
@@ -14123,12 +14074,10 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
         }
       }, _callee2, null, [[1, 17, 21, 25]]);
     }));
-
     return function fetchElements() {
       return _ref3.apply(this, arguments);
     };
   }();
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchElements();
   }, [query]);
@@ -14145,7 +14094,6 @@ var DataTableContainer_DataTableContainer = function DataTableContainer(_ref) {
     cbrainIds: cbrainIdsState
   }, dataTableProps));
 };
-
 DataTableContainer_DataTableContainer.propTypes = {
   authorized: prop_types_default.a.bool,
   endpointURL: prop_types_default.a.string.isRequired,
@@ -20599,23 +20547,19 @@ var LoadingSpinner = function LoadingSpinner(props) {
     className: "sr-only"
   }, "Loading...")));
 };
-
 /* harmony default export */ var charts_LoadingSpinner = (LoadingSpinner);
 // CONCATENATED MODULE: ./src/social/ViewsIcon/index.js
 
 
 
 
-
 var ViewsIcon_ViewsIcon = function ViewsIcon(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      views = _useState[0],
-      setViews = _useState[1];
-
+    views = _useState[0],
+    setViews = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState2[0],
-      setIsLoading = _useState2[1];
-
+    isLoading = _useState2[0],
+    setIsLoading = _useState2[1];
   var url = props.type === "dataset" ? "/analytics/datasets/views?id=" + props.id : "/analytics/pipelines/views?id=" + props.id;
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchViews();
@@ -20625,7 +20569,6 @@ var ViewsIcon_ViewsIcon = function ViewsIcon(props) {
       setIsLoading(false);
     }
   }, [views]);
-
   var fetchViews = function fetchViews() {
     try {
       fetch(url).then(function (res) {
@@ -20637,7 +20580,6 @@ var ViewsIcon_ViewsIcon = function ViewsIcon(props) {
       console.error(err);
     }
   };
-
   return isLoading ? /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_LoadingSpinner, null) : /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "d-flex flex-column align-items-center mx-2"
   }, /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(FontAwesomeIcon, {
@@ -20646,22 +20588,18 @@ var ViewsIcon_ViewsIcon = function ViewsIcon(props) {
     size: "md"
   }), !!views && views.nb_hits || 0);
 };
-
 /* harmony default export */ var social_ViewsIcon = (ViewsIcon_ViewsIcon);
 // CONCATENATED MODULE: ./src/social/DownloadsIcon/index.js
 
 
 
-
 var DownloadsIcon_DownloadsIcon = function DownloadsIcon(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      downloads = _useState[0],
-      setDownloads = _useState[1];
-
+    downloads = _useState[0],
+    setDownloads = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState2[0],
-      setIsLoading = _useState2[1];
-
+    isLoading = _useState2[0],
+    setIsLoading = _useState2[1];
   var url = props.type === "dataset" ? "/analytics/datasets/downloads?id=" + props.id : "/analytics/pipelines/downloads?id=" + props.id;
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchDownloads();
@@ -20671,7 +20609,6 @@ var DownloadsIcon_DownloadsIcon = function DownloadsIcon(props) {
       setIsLoading(false);
     }
   }, [downloads]);
-
   var fetchDownloads = function fetchDownloads() {
     try {
       fetch(url).then(function (res) {
@@ -20683,7 +20620,6 @@ var DownloadsIcon_DownloadsIcon = function DownloadsIcon(props) {
       console.error(err);
     }
   };
-
   return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "d-flex flex-column align-items-center mx-2"
   }, /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(FontAwesomeIcon, {
@@ -20692,7 +20628,6 @@ var DownloadsIcon_DownloadsIcon = function DownloadsIcon(props) {
     size: "md"
   }), !!downloads && downloads.nb_hits || "NA");
 };
-
 /* harmony default export */ var social_DownloadsIcon = (DownloadsIcon_DownloadsIcon);
 // EXTERNAL MODULE: ./node_modules/react-copy-to-clipboard/lib/index.js
 var lib = __webpack_require__(82);
@@ -21628,30 +21563,23 @@ var index_es_iconsCache = {
 
 
 
-
 var ArkIdElement_ArkIdElement = function ArkIdElement(props) {
   var ark_id = props.id;
-
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showText = _useState[0],
-      setShowText = _useState[1];
-
+    showText = _useState[0],
+    setShowText = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      showCopyIcon = _useState2[0],
-      setShowCopyIcon = _useState2[1];
-
+    showCopyIcon = _useState2[0],
+    setShowCopyIcon = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showCheckIcon = _useState3[0],
-      setShowCheckIcon = _useState3[1];
-
+    showCheckIcon = _useState3[0],
+    setShowCheckIcon = _useState3[1];
   var handleMouseEnter = function handleMouseEnter(e) {
     setShowText(true);
   };
-
   var handleMouseLeave = function handleMouseLeave(e) {
     setShowText(false);
   };
-
   var handleCopyToClipboard = function handleCopyToClipboard(e) {
     setShowCopyIcon(false);
     setShowCheckIcon(true);
@@ -21660,7 +21588,6 @@ var ArkIdElement_ArkIdElement = function ArkIdElement(props) {
       setShowCheckIcon(false);
     }, 1000);
   };
-
   return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "card-list-item"
   }, /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
@@ -21710,7 +21637,6 @@ var ArkIdElement_ArkIdElement = function ArkIdElement(props) {
     size: "md"
   }))));
 };
-
 /* harmony default export */ var src_ArkIdElement = (ArkIdElement_ArkIdElement);
 // EXTERNAL MODULE: ./node_modules/react-dom/index.js
 var react_dom = __webpack_require__(10);
@@ -21720,15 +21646,12 @@ var react_dom_default = /*#__PURE__*/__webpack_require__.n(react_dom);
 
 
 
-
 var DownloadModalWindowElement_DownloadModalWindowElement = function DownloadModalWindowElement(props) {
   var size = props.size,
-      zipLocation = props.zipLocation;
-
+    zipLocation = props.zipLocation;
   var close = function close(event) {
     $("#downloadModal").modal("hide");
   };
-
   return react_dom["createPortal"]( /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "modal-content"
   }, /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
@@ -21776,7 +21699,6 @@ var DownloadModalWindowElement_DownloadModalWindowElement = function DownloadMod
     onClick: close
   }, "Download")))), document.querySelector("#downloadModalDocument"));
 };
-
 DownloadModalWindowElement_DownloadModalWindowElement.propTypes = {
   size: prop_types_default.a.string,
   zipLocation: prop_types_default.a.string
@@ -21790,23 +21712,18 @@ DownloadModalWindowElement_DownloadModalWindowElement.defaultProps = {
 
 
 
-
 var CbrainModalDataset_CbrainModalDataset = function CbrainModalDataset(props) {
   var cbrain_id = props.cbrain_id,
-      cbrainIds = props.cbrainIds,
-      title = props.title;
-
+    cbrainIds = props.cbrainIds,
+    title = props.title;
   var finish = function finish(event) {
     $("#cbrainModal").modal("hide");
   };
-
   var datasetCbrainId = cbrain_id.split("%3Fid%3D")[1];
   var baseUrl = "https%3A%2F%2Fportal.cbrain.mcgill.ca%2Fuserfiles%3Fswitch_group_id%3D" + datasetCbrainId;
-
   var getPipelineId = function getPipelineId(pipelineUrl) {
     return pipelineUrl.split("/userfiles?")[1];
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     $("#cbrainModal").modal("handleUpdate");
     return;
@@ -21835,7 +21752,6 @@ var CbrainModalDataset_CbrainModalDataset = function CbrainModalDataset(props) {
     }, pipeline.title);
   }))), document.querySelector("#cbrainModalBody"));
 };
-
 CbrainModalDataset_CbrainModalDataset.propTypes = {
   title: prop_types_default.a.string,
   cbrain_id: prop_types_default.a.string,
@@ -21860,38 +21776,28 @@ function DatasetElement_objectWithoutPropertiesLoose(source, excluded) { if (sou
 
 
 
-
-
 var DatasetElement_DatasetElement = function DatasetElement(props) {
   var _element$origin, _element$origin2;
-
   var authorized = props.authorized,
-      imagePath = props.imagePath,
-      element = DatasetElement_objectWithoutPropertiesLoose(props, ["authorized", "imagePath"]);
-
+    imagePath = props.imagePath,
+    element = DatasetElement_objectWithoutPropertiesLoose(props, ["authorized", "imagePath"]);
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      downloadModalOpen = _useState[0],
-      setDownloadModalOpen = _useState[1];
-
+    downloadModalOpen = _useState[0],
+    setDownloadModalOpen = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showCbrainTipText = _useState2[0],
-      setShowCbrainTipText = _useState2[1];
-
+    showCbrainTipText = _useState2[0],
+    setShowCbrainTipText = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showDataLadTipText = _useState3[0],
-      setShowDataLadTipText = _useState3[1];
-
+    showDataLadTipText = _useState3[0],
+    setShowDataLadTipText = _useState3[1];
   var _useState4 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showDownloadTipText = _useState4[0],
-      setShowDownloadTipText = _useState4[1];
-
+    showDownloadTipText = _useState4[0],
+    setShowDownloadTipText = _useState4[1];
   var _useState5 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      cbrainModalOpen = _useState5[0],
-      setCbrainModalOpen = _useState5[1];
-
+    cbrainModalOpen = _useState5[0],
+    setCbrainModalOpen = _useState5[1];
   var statusCONP = imagePath + "/canada.svg";
   var authIcons = [];
-
   switch (element.authorizations) {
     case "restricted":
       authIcons.push( /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("span", null, /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(FontAwesomeIcon, {
@@ -21900,7 +21806,6 @@ var DatasetElement_DatasetElement = function DatasetElement(props) {
         size: "lg"
       }), " - CONP account required"));
       break;
-
     case "private":
     case "registered":
     case "controlled":
@@ -21913,49 +21818,38 @@ var DatasetElement_DatasetElement = function DatasetElement(props) {
         href: element.registrationPage
       }, "Third-party account required") : /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.Fragment, null, "Third-party account required")));
       break;
-
     default:
       break;
   }
-
   var handleCrainMouseEnter = function handleCrainMouseEnter(e) {
     setShowCbrainTipText(true);
   };
-
   var handleCrainMouseLeave = function handleCrainMouseLeave(e) {
     setShowCbrainTipText(false);
   };
-
   var handleDataLadMouseEnter = function handleDataLadMouseEnter(e) {
     setShowDataLadTipText(true);
   };
-
   var handleDataLadMouseLeave = function handleDataLadMouseLeave(e) {
     setShowDataLadTipText(false);
   };
-
   var handleDownloadMouseEnter = function handleDownloadMouseEnter(e) {
     setShowDownloadTipText(true);
   };
-
   var handleDownloadMouseLeave = function handleDownloadMouseLeave(e) {
     setShowDownloadTipText(false);
   };
-
   var openCbrainModal = function openCbrainModal() {
     $("#cbrainModal").modal("show");
     setCbrainModalOpen(true);
   };
-
   $("#cbrainModal").on("hidden.bs.modal", function (event) {
     return setCbrainModalOpen(false);
   });
-
   var openDownloadModal = function openDownloadModal() {
     $("#downloadModal").modal("show");
     setDownloadModalOpen(true);
   };
-
   $("#downloadModal").on("hidden.bs.modal", function (event) {
     return setDownloadModalOpen(false);
   });
@@ -22157,7 +22051,6 @@ var DatasetElement_DatasetElement = function DatasetElement(props) {
     cbrain_id: element.cbrain_id
   }) : null);
 };
-
 DatasetElement_DatasetElement.propTypes = {
   authorized: prop_types_default.a.bool,
   onRunWithCBRAIN: prop_types_default.a.func,
@@ -22194,22 +22087,17 @@ DatasetElement_DatasetElement.defaultProps = {
 
 
 
-
 var CbrainModalPipeline_CbrainModalPipeline = function CbrainModalPipeline(props) {
   var platforms = props.platforms,
-      title = props.title,
-      cbrainIds = props.cbrainIds;
-
+    title = props.title,
+    cbrainIds = props.cbrainIds;
   var finish = function finish(event) {
     $("#cbrainModal").modal("hide");
   };
-
   var baseUrl = platforms[0].uri;
-
   var getDatasetId = function getDatasetId(datasetUrl) {
     return "switch_group_id=" + datasetUrl.split("%3Fid%3D")[1];
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     $("#cbrainModal").modal("handleUpdate");
     return;
@@ -22238,7 +22126,6 @@ var CbrainModalPipeline_CbrainModalPipeline = function CbrainModalPipeline(props
     }, dataset.title);
   }))), document.querySelector("#cbrainModalBody"));
 };
-
 CbrainModalPipeline_CbrainModalPipeline.propTypes = {
   title: prop_types_default.a.string,
   cbrainIds: prop_types_default.a.arrayOf(prop_types_default.a.Object)
@@ -22255,37 +22142,28 @@ function PipelineElement_objectWithoutPropertiesLoose(source, excluded) { if (so
 
 
 
-
-
 var PipelineElement_PipelineElement = function PipelineElement(props) {
   var authorized = props.authorized,
-      element = PipelineElement_objectWithoutPropertiesLoose(props, ["authorized"]);
-
+    element = PipelineElement_objectWithoutPropertiesLoose(props, ["authorized"]);
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      showCbrainTipText = _useState[0],
-      setShowCbrainTipText = _useState[1];
-
+    showCbrainTipText = _useState[0],
+    setShowCbrainTipText = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(false),
-      cbrainModalOpen = _useState2[0],
-      setCbrainModalOpen = _useState2[1];
-
+    cbrainModalOpen = _useState2[0],
+    setCbrainModalOpen = _useState2[1];
   var openCbrainModal = function openCbrainModal(datasetTitle, datasetUrl, pipelineTitle, pipelineUrl) {
     $("#cbrainModal").modal("show");
     setCbrainModalOpen(true);
   };
-
   $("#cbrainModal").on("hidden.bs.modal", function (event) {
     return setCbrainModalOpen(false);
   });
-
   var handleCrainMouseEnter = function handleCrainMouseEnter(e) {
     setShowCbrainTipText(true);
   };
-
   var handleCrainMouseLeave = function handleCrainMouseLeave(e) {
     setShowCbrainTipText(false);
   };
-
   var platforms = element.platforms.map(function (item, key) {
     return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
       className: "row w-100 align-items-center"
@@ -22409,7 +22287,6 @@ var PipelineElement_PipelineElement = function PipelineElement(props) {
     cbrainIds: element.cbrainIds
   }) : null);
 };
-
 PipelineElement_PipelineElement.propTypes = {
   id: prop_types_default.a.string,
   title: prop_types_default.a.string,
@@ -22436,12 +22313,9 @@ PipelineElement_PipelineElement.propTypes = {
 function ExecutionRecordElement_objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
 
-
-
 var ExecutionRecordElement_ExecutionRecordElement = function ExecutionRecordElement(props) {
   var authorized = props.authorized,
-      element = ExecutionRecordElement_objectWithoutPropertiesLoose(props, ["authorized"]);
-
+    element = ExecutionRecordElement_objectWithoutPropertiesLoose(props, ["authorized"]);
   return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     className: "card flex-row",
     "data-type": "pipeline"
@@ -22469,7 +22343,6 @@ var ExecutionRecordElement_ExecutionRecordElement = function ExecutionRecordElem
     title: "Browse Execution Record"
   }, element.executionRecord))))));
 };
-
 ExecutionRecordElement_ExecutionRecordElement.propTypes = {
   pipelineName: prop_types_default.a.string,
   pipelineUrl: prop_types_default.a.string,
@@ -22481,14 +22354,9 @@ ExecutionRecordElement_ExecutionRecordElement.propTypes = {
 /* harmony default export */ var src_ExecutionRecordElement = (ExecutionRecordElement_ExecutionRecordElement);
 // CONCATENATED MODULE: ./src/ElementContainer/index.js
 
-
 function ElementContainer_extends() { ElementContainer_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return ElementContainer_extends.apply(this, arguments); }
-
 function ElementContainer_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function ElementContainer_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { ElementContainer_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { ElementContainer_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-
 
 
 
@@ -22496,13 +22364,11 @@ function ElementContainer_asyncToGenerator(fn) { return function () { var self =
 
 var ElementContainer_ElementContainer = function ElementContainer(_ref) {
   var element = _ref.element,
-      elementProps = _ref.elementProps,
-      complementUrl = _ref.complementUrl;
-
+    elementProps = _ref.elementProps,
+    complementUrl = _ref.complementUrl;
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])([]),
-      cbrainIdsState = _useState[0],
-      setCbrainIdsState = _useState[1];
-
+    cbrainIdsState = _useState[0],
+    setCbrainIdsState = _useState[1];
   var fetchCbrainIds = /*#__PURE__*/function () {
     var _ref2 = ElementContainer_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       var url, res, parsed;
@@ -22520,21 +22386,16 @@ var ElementContainer_ElementContainer = function ElementContainer(_ref) {
               _context.prev = 1;
               _context.next = 4;
               return fetch(url);
-
             case 4:
               res = _context.sent;
-
               if (res.ok) {
                 _context.next = 7;
                 break;
               }
-
               throw new Error("Request failed with status: " + res.status + " (" + res.statusText + ")");
-
             case 7:
               _context.next = 9;
               return res.json();
-
             case 9:
               parsed = _context.sent;
               setCbrainIdsState(parsed.elements.map(function (element) {
@@ -22550,13 +22411,11 @@ var ElementContainer_ElementContainer = function ElementContainer(_ref) {
               }));
               _context.next = 17;
               break;
-
             case 13:
               _context.prev = 13;
               _context.t0 = _context["catch"](1);
               alert("There was an error populating the CBRAIN options.");
               console.error(_context.t0);
-
             case 17:
             case "end":
               return _context.stop();
@@ -22564,12 +22423,10 @@ var ElementContainer_ElementContainer = function ElementContainer(_ref) {
         }
       }, _callee, null, [[1, 13]]);
     }));
-
     return function fetchCbrainIds() {
       return _ref2.apply(this, arguments);
     };
   }();
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchCbrainIds();
   }, []);
@@ -22577,7 +22434,6 @@ var ElementContainer_ElementContainer = function ElementContainer(_ref) {
     cbrainIds: cbrainIdsState
   }));
 };
-
 ElementContainer_ElementContainer.propTypes = {
   element: prop_types_default.a.oneOfType([prop_types_default.a.instanceOf(src_DatasetElement), prop_types_default.a.instanceOf(src_PipelineElement)]),
   elementProps: prop_types_default.a.object,
@@ -22594,13 +22450,9 @@ var highcharts_react_min_default = /*#__PURE__*/__webpack_require__.n(highcharts
 
 // CONCATENATED MODULE: ./src/charts/TotalDatasetsPipelines/index.js
 
-
 function TotalDatasetsPipelines_extends() { TotalDatasetsPipelines_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return TotalDatasetsPipelines_extends.apply(this, arguments); }
-
 function TotalDatasetsPipelines_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function TotalDatasetsPipelines_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { TotalDatasetsPipelines_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { TotalDatasetsPipelines_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 
 
 
@@ -22641,24 +22493,19 @@ var defaultOptions = {
     yAxis: 0
   }]
 };
-
 var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipelines(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = TotalDatasetsPipelines_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -22687,7 +22534,6 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -22695,12 +22541,10 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(axes) {
     var xAxis = [];
     var yAxisDatasets = [];
@@ -22720,16 +22564,14 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
         yAxisPipelines.push(countPipelines);
       });
     });
+
     /* Only show pipeline data for the months we have dataset data */
-
     var yAxisPipelinesExtract = yAxisPipelines;
-
     if (yAxisDatasets.length > yAxisPipelines.length) {
       yAxisPipelinesExtract = new Array(yAxisDatasets.length - yAxisPipelines.length).fill(0).concat(yAxisPipelines);
     } else if (yAxisDatasets.length < yAxisPipelines.length) {
       yAxisPipelinesExtract = yAxisPipelines.slice(Math.max(yAxisPipelines.length - xAxis.length, 0));
     }
-
     var series = [{
       name: 'Datasets',
       color: '#EA2627B3',
@@ -22751,12 +22593,10 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData || !chartData.datasets || !chartData.pipelines) {
       return;
     }
-
     var axes = {
       datasets: {},
       pipelines: {}
@@ -22765,39 +22605,32 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
       var dateAdded = new Date(element.dateAdded.concat('T00:00:00'));
       var dateAddedYear = dateAdded.getFullYear();
       var dateAddedMonth = dateAdded.getMonth() + 1;
-
       if (!axes.datasets[dateAddedYear]) {
         axes.datasets[dateAddedYear] = {};
       }
-
       if (!axes.datasets[dateAddedYear][dateAddedMonth]) {
         axes.datasets[dateAddedYear][dateAddedMonth] = 1;
       } else {
         axes.datasets[dateAddedYear][dateAddedMonth] += 1;
       }
     });
+
     /* check if we've skipped months */
-
     var today = new Date();
-
     if (!Object.keys(axes.datasets).includes(today.getFullYear().toString())) {
       axes.datasets[today.getFullYear()] = {};
     }
-
     if (!Object.keys(axes.pipelines).includes(today.getFullYear().toString())) {
       axes.pipelines[today.getFullYear()] = {};
     }
-
     Object.keys(axes.datasets).forEach(function (year) {
       for (var i = 1; i <= 12; i++) {
         if (parseInt(year) === today.getFullYear() && i === today.getMonth() + 2) {
           break;
         }
-
         if (Object.keys(axes.datasets).includes((year - 1).toString()) && !Object.keys(axes.datasets[year]).includes("" + i) && i === 1) {
           axes.datasets[year][i] = 0;
         }
-
         if (Object.keys(axes.datasets[year]).includes("" + (i - 1)) && !Object.keys(axes.datasets[year]).includes("" + i)) {
           axes.datasets[year][i] = 0;
         }
@@ -22805,11 +22638,9 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
     });
     chartData.pipelines.elements.forEach(function (element) {
       var dateAdded = new Date(element.publicationdate);
-
       if (!axes.pipelines[dateAdded.getFullYear()]) {
         axes.pipelines[dateAdded.getFullYear()] = {};
       }
-
       if (!axes.pipelines[dateAdded.getFullYear()][dateAdded.getMonth() + 1]) {
         axes.pipelines[dateAdded.getFullYear()][dateAdded.getMonth() + 1] = 1;
       } else {
@@ -22821,11 +22652,9 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
         if (year === String(today.getFullYear()) && i === today.getMonth() + 2) {
           break;
         }
-
         if (Object.keys(axes.pipelines).includes((year - 1).toString()) && !Object.keys(axes.pipelines[year]).includes("" + i) && i === 1) {
           axes.pipelines[year][i] = 0;
         }
-
         if (Object.keys(axes.pipelines[year]).includes("" + (i - 1)) && !Object.keys(axes.pipelines[year]).includes("" + i)) {
           axes.pipelines[year][i] = 0;
         }
@@ -22838,22 +22667,17 @@ var TotalDatasetsPipelines_TotalDatasetsPipelines = function TotalDatasetsPipeli
     options: options
   });
 };
-
 /* harmony default export */ var charts_TotalDatasetsPipelines = (TotalDatasetsPipelines_TotalDatasetsPipelines);
 // CONCATENATED MODULE: ./src/charts/ContextMenu/index.js
 function ContextMenu_extends() { ContextMenu_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return ContextMenu_extends.apply(this, arguments); }
 
-
-
 var ContextMenu_ContextMenu = function ContextMenu(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(null),
-      dimensions = _useState[0],
-      setDimensions = _useState[1];
-
+    dimensions = _useState[0],
+    setDimensions = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(null),
-      style = _useState2[0],
-      setStyle = _useState2[1];
-
+    style = _useState2[0],
+    setStyle = _useState2[1];
   var callBackRef = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useCallback"])(function (domNode) {
     if (domNode) {
       setDimensions(domNode.getBoundingClientRect());
@@ -22865,7 +22689,8 @@ var ContextMenu_ContextMenu = function ContextMenu(props) {
       left: props.options.style.left - dimensions.left
     }));
   }, [dimensions, props.options.style]);
-  Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {// $(".dropdown-menu").toggle()
+  Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
+    // $(".dropdown-menu").toggle()
   }, [props.options.style]);
   return /*#__PURE__*/React.createElement("div", {
     ref: callBackRef,
@@ -22887,27 +22712,19 @@ var ContextMenu_ContextMenu = function ContextMenu(props) {
     rel: "noreferrer"
   }, props.options.actionText, " in New Tab")));
 };
-
 /* harmony default export */ var charts_ContextMenu = (ContextMenu_ContextMenu);
 // CONCATENATED MODULE: ./src/charts/DatasetModalities/index.js
 
-
 function DatasetModalities_extends() { DatasetModalities_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return DatasetModalities_extends.apply(this, arguments); }
-
 function DatasetModalities_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function DatasetModalities_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { DatasetModalities_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { DatasetModalities_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
 
 
 
-
-
 __webpack_require__(80)(highcharts_default.a);
-
 __webpack_require__(81)(highcharts_default.a);
-
 var DatasetModalities_defaultOptions = {
   chart: {
     type: 'packedbubble',
@@ -22966,28 +22783,22 @@ var DatasetModalities_defaultOptions = {
   },
   series: []
 };
-
 var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(DatasetModalities_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   var _useState4 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])({}),
-      contextMenuOptions = _useState4[0],
-      setContextMenuOptions = _useState4[1];
-
+    contextMenuOptions = _useState4[0],
+    setContextMenuOptions = _useState4[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = DatasetModalities_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23007,7 +22818,6 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23015,12 +22825,10 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(data) {
     var datasetData = Object.keys(data.datasets).map(function (d) {
       return {
@@ -23039,12 +22847,10 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       datasets: {}
     };
@@ -23056,7 +22862,6 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
     });
     updateChart(axes);
   }, [chartData]);
-
   var addOrIncreaseDatapoint = function addOrIncreaseDatapoint(data, point) {
     if (!Object.keys(data).includes(point)) {
       data[point] = 1;
@@ -23064,7 +22869,6 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
       data[point] += 1;
     }
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     setOptions(function (prevOptions) {
       var options = prevOptions;
@@ -23099,27 +22903,19 @@ var DatasetModalities_DatasetModalities = function DatasetModalities(props) {
     options: options
   }));
 };
-
 /* harmony default export */ var charts_DatasetModalities = (DatasetModalities_DatasetModalities);
 // CONCATENATED MODULE: ./src/charts/PipelineTags/index.js
 
-
 function PipelineTags_extends() { PipelineTags_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return PipelineTags_extends.apply(this, arguments); }
-
 function PipelineTags_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function PipelineTags_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { PipelineTags_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { PipelineTags_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
 
 
 
-
-
 __webpack_require__(80)(highcharts_default.a);
-
 __webpack_require__(81)(highcharts_default.a);
-
 var PipelineTags_defaultOptions = {
   chart: {
     type: 'packedbubble',
@@ -23178,28 +22974,22 @@ var PipelineTags_defaultOptions = {
   },
   series: []
 };
-
 var PipelineTags_PipelineTags = function PipelineTags(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(PipelineTags_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   var _useState4 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])({}),
-      contextMenuOptions = _useState4[0],
-      setContextMenuOptions = _useState4[1];
-
+    contextMenuOptions = _useState4[0],
+    setContextMenuOptions = _useState4[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = PipelineTags_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23219,7 +23009,6 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23227,12 +23016,10 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(data) {
     var pipelineData = Object.keys(data.pipelines).map(function (p) {
       return {
@@ -23251,23 +23038,19 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       pipelines: {}
     };
     chartData.pipelines.elements.forEach(function (pipeline) {
       if (!pipeline.tags.domain) return;
-
       if (!Array.isArray(pipeline.tags.domain)) {
         addOrIncreaseDatapoint(axes.pipelines, pipeline.tags.domain);
         return;
       }
-
       var tagsArr = pipeline.tags.domain;
       tagsArr.forEach(function (tag) {
         addOrIncreaseDatapoint(axes.pipelines, tag.toLowerCase());
@@ -23275,7 +23058,6 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
     });
     updateChart(axes);
   }, [chartData]);
-
   var addOrIncreaseDatapoint = function addOrIncreaseDatapoint(data, point) {
     if (!Object.keys(data).includes(point)) {
       data[point] = 1;
@@ -23283,7 +23065,6 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
       data[point] += 1;
     }
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     setOptions(function (prevOptions) {
       var options = prevOptions;
@@ -23319,17 +23100,12 @@ var PipelineTags_PipelineTags = function PipelineTags(props) {
     options: options
   }));
 };
-
 /* harmony default export */ var charts_PipelineTags = (PipelineTags_PipelineTags);
 // CONCATENATED MODULE: ./src/charts/DailyVisitors/index.js
 
-
 function DailyVisitors_extends() { DailyVisitors_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return DailyVisitors_extends.apply(this, arguments); }
-
 function DailyVisitors_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function DailyVisitors_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { DailyVisitors_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { DailyVisitors_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 
 
 
@@ -23391,24 +23167,19 @@ var DailyVisitors_defaultOptions = {
     yAxis: 0
   }]
 };
-
 var DailyVisitors_DailyVisitors = function DailyVisitors(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(DailyVisitors_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = DailyVisitors_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23426,7 +23197,6 @@ var DailyVisitors_DailyVisitors = function DailyVisitors(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23434,12 +23204,10 @@ var DailyVisitors_DailyVisitors = function DailyVisitors(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(axes) {
     var xAxis = [];
     var yAxisVisitors = [];
@@ -23476,22 +23244,18 @@ var DailyVisitors_DailyVisitors = function DailyVisitors(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       visitors: {}
     };
     chartData.visitors.forEach(function (element) {
       var dateOfVisit = new Date(element.date);
-
       if (!axes.visitors[dateOfVisit.getFullYear()]) {
         axes.visitors[dateOfVisit.getFullYear()] = {};
       }
-
       if (!axes.visitors[dateOfVisit.getFullYear()][dateOfVisit.getMonth() + 1]) {
         axes.visitors[dateOfVisit.getFullYear()][dateOfVisit.getMonth() + 1] = element.nb_uniq_visitors;
       } else {
@@ -23505,17 +23269,12 @@ var DailyVisitors_DailyVisitors = function DailyVisitors(props) {
     options: options
   });
 };
-
 /* harmony default export */ var charts_DailyVisitors = (DailyVisitors_DailyVisitors);
 // CONCATENATED MODULE: ./src/charts/DatasetPageViews/index.js
 
-
 function DatasetPageViews_extends() { DatasetPageViews_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return DatasetPageViews_extends.apply(this, arguments); }
-
 function DatasetPageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function DatasetPageViews_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { DatasetPageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { DatasetPageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 
 
 
@@ -23546,24 +23305,19 @@ var DatasetPageViews_defaultOptions = {
   },
   series: []
 };
-
 var DatasetPageViews_DatasetPageViews = function DatasetPageViews(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(DatasetPageViews_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = DatasetPageViews_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23581,7 +23335,6 @@ var DatasetPageViews_DatasetPageViews = function DatasetPageViews(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23589,12 +23342,10 @@ var DatasetPageViews_DatasetPageViews = function DatasetPageViews(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(axes) {
     var xAxis = [];
     var yAxis = [];
@@ -23619,12 +23370,10 @@ var DatasetPageViews_DatasetPageViews = function DatasetPageViews(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       views: {}
     };
@@ -23639,17 +23388,12 @@ var DatasetPageViews_DatasetPageViews = function DatasetPageViews(props) {
     options: options
   });
 };
-
 /* harmony default export */ var charts_DatasetPageViews = (DatasetPageViews_DatasetPageViews);
 // CONCATENATED MODULE: ./src/charts/PipelinePageViews/index.js
 
-
 function PipelinePageViews_extends() { PipelinePageViews_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return PipelinePageViews_extends.apply(this, arguments); }
-
 function PipelinePageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function PipelinePageViews_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { PipelinePageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { PipelinePageViews_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 
 
 
@@ -23680,24 +23424,19 @@ var PipelinePageViews_defaultOptions = {
   },
   series: []
 };
-
 var PipelinePageViews_PipelinePageViews = function PipelinePageViews(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(PipelinePageViews_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = PipelinePageViews_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23715,7 +23454,6 @@ var PipelinePageViews_PipelinePageViews = function PipelinePageViews(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23723,12 +23461,10 @@ var PipelinePageViews_PipelinePageViews = function PipelinePageViews(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(axes) {
     var xAxis = [];
     var yAxis = [];
@@ -23753,12 +23489,10 @@ var PipelinePageViews_PipelinePageViews = function PipelinePageViews(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       views: {}
     };
@@ -23773,17 +23507,12 @@ var PipelinePageViews_PipelinePageViews = function PipelinePageViews(props) {
     options: options
   });
 };
-
 /* harmony default export */ var charts_PipelinePageViews = (PipelinePageViews_PipelinePageViews);
 // CONCATENATED MODULE: ./src/charts/Keywords/index.js
 
-
 function Keywords_extends() { Keywords_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return Keywords_extends.apply(this, arguments); }
-
 function Keywords_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
 function Keywords_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Keywords_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Keywords_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 
 
 
@@ -23814,24 +23543,19 @@ var Keywords_defaultOptions = {
   },
   series: []
 };
-
 var Keywords_Keywords = function Keywords(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(),
-      chartData = _useState[0],
-      setChartData = _useState[1];
-
+    chartData = _useState[0],
+    setChartData = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(Keywords_defaultOptions),
-      options = _useState2[0],
-      setOptions = _useState2[1];
-
+    options = _useState2[0],
+    setOptions = _useState2[1];
   var _useState3 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(true),
-      isLoading = _useState3[0],
-      setIsLoading = _useState3[1];
-
+    isLoading = _useState3[0],
+    setIsLoading = _useState3[1];
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     fetchChartData();
   }, []);
-
   var fetchChartData = /*#__PURE__*/function () {
     var _ref = Keywords_asyncToGenerator( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
       return regenerator_default.a.wrap(function _callee$(_context) {
@@ -23849,7 +23573,6 @@ var Keywords_Keywords = function Keywords(props) {
               } catch (err) {
                 console.error(err);
               }
-
             case 1:
             case "end":
               return _context.stop();
@@ -23857,12 +23580,10 @@ var Keywords_Keywords = function Keywords(props) {
         }
       }, _callee);
     }));
-
     return function fetchChartData() {
       return _ref.apply(this, arguments);
     };
   }();
-
   var updateChart = function updateChart(axes) {
     var xAxis = [];
     var yAxis = [];
@@ -23887,12 +23608,10 @@ var Keywords_Keywords = function Keywords(props) {
     });
     setIsLoading(false);
   };
-
   Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useEffect"])(function () {
     if (!chartData) {
       return;
     }
-
     var axes = {
       keywords: {}
     };
@@ -23906,7 +23625,6 @@ var Keywords_Keywords = function Keywords(props) {
     options: options
   });
 };
-
 /* harmony default export */ var charts_Keywords = (Keywords_Keywords);
 // CONCATENATED MODULE: ./src/ChartContainer/index.js
 
@@ -23917,44 +23635,33 @@ var Keywords_Keywords = function Keywords(props) {
 
 
 
-
 var ChartContainer_ChartContainer = function ChartContainer(props) {
   var _useState = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(props.showToggle || false),
-      showToggle = _useState[0],
-      setShowToggle = _useState[1];
-
+    showToggle = _useState[0],
+    setShowToggle = _useState[1];
   var _useState2 = Object(external_root_React_commonjs2_react_commonjs_react_amd_react_["useState"])(props.toggleState),
-      toggleState = _useState2[0],
-      setToggleState = _useState2[1];
-
+    toggleState = _useState2[0],
+    setToggleState = _useState2[1];
   var renderChart = function renderChart() {
     switch (toggleState) {
       case "TotalDatasetsPipelines":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_TotalDatasetsPipelines, null);
-
       case "DatasetModalities":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_DatasetModalities, null);
-
       case "PipelineTags":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_PipelineTags, null);
-
       case "DailyVisitors":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_DailyVisitors, null);
-
       case "DatasetPageViews":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_DatasetPageViews, null);
-
       case "PipelinePageViews":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_PipelinePageViews, null);
-
       case "Keywords":
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_Keywords, null);
-
       default:
         return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement(charts_TotalDatasetsPipelines, null);
     }
   };
-
   return /*#__PURE__*/external_root_React_commonjs2_react_commonjs_react_amd_react_default.a.createElement("div", {
     style: {
       minHeight: "360px"
@@ -23989,10 +23696,8 @@ var ChartContainer_ChartContainer = function ChartContainer(props) {
     onClick: setToggleState("PipelineTags")
   }, "Pipeline Tags")))) : null, renderChart());
 };
-
 /* harmony default export */ var src_ChartContainer = (ChartContainer_ChartContainer);
 // CONCATENATED MODULE: ./src/StudySpotlight/index.js
-
 
 var StudySpotlight_StudySpotlight = function StudySpotlight(props) {
   var studies = [
@@ -24136,7 +23841,6 @@ var StudySpotlight_StudySpotlight = function StudySpotlight(props) {
     "class": "sr-only"
   }, "Next"))));
 };
-
 /* harmony default export */ var src_StudySpotlight = (StudySpotlight_StudySpotlight);
 // EXTERNAL MODULE: ./node_modules/react-fast-compare/index.js
 var react_fast_compare = __webpack_require__(33);
