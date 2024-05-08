@@ -10,6 +10,7 @@ from typing import Optional
 import dateutil
 import requests
 
+from app.dats import DATSObject
 
 @lru_cache(maxsize=1)
 def _get_latest_test_results(date):
@@ -590,7 +591,7 @@ class DATSDataset(object):
         except Exception:
             return None
 
-    @ property
+    @property
     def status(self):
 
         test_results = get_latest_test_results()
