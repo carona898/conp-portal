@@ -500,6 +500,10 @@ class Experiment(db.Model):
     date_updated = db.Column(db.DateTime, default=datetime.now())
     date_added_to_portal = db.Column(db.DateTime, default=datetime.now())
     is_private = db.Column(db.Boolean, index=True)
+    #ALEX count downloads
+    downloads = db.Column(db.Integer, default=0)
+    #ALEX count views
+    views = db.Column(db.Integer, default=0)
 
     def __repr__(self):
         return '<Dataset {}>'.format(self.name)

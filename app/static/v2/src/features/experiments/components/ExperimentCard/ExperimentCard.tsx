@@ -8,11 +8,23 @@ import ReactFreezeframe from 'react-freezeframe';
 
 interface ExperimentCardProps {
   titleLink?: string;
+  downloadLink: string;
   experiment: Experiment;
 }
 
+const getPlatformFromUrl = (url: string): string => {
+  const match = url.match(/https:\/\/(.*?)\.[a-z]+\/?/);
+  if (!match) return "";
+
+  // Capture le terme de la plateforme et met la première lettre en majuscule
+  const platform = match[1];
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
+};
+
+
 export const ExperimentCard = ({
   titleLink,
+  downloadLink,
   experiment: {
     title,
     description,
@@ -30,7 +42,9 @@ export const ExperimentCard = ({
     imageFile,
     repositoryFileCount,
     repositorySize,
-    id
+    id,
+    remoteUrl,
+    source
   }
 }: ExperimentCardProps) => {
   return (
@@ -39,6 +53,16 @@ export const ExperimentCard = ({
         <div className="col col-sm-2 d-flex flex-column justify-content-center">
           <div className="container-fluid p-2">
             <ReactFreezeframe className="animated-gif img-fluid" alt="experiment image" src={`/experiments/experiment_logo/${id}`} />
+          </div>
+          <div className='flex-grow-2 d-flex fex-row justify-content-center align-items-end'>
+            <div className="d-flex flex-column align-items-center mx-2">
+              <i className="fa fa-eye fa-lg" aria-hidden="true"></i>
+                {views.toString() === "" ? "N/A" : views}
+            </div>
+            <div className="d-flex flex-column align-items-center mx-2">
+              <i className="fa fa-download fa-lg" aria-hidden="true"></i>
+                {downloads.toString() === "" ? "N/A" : downloads}
+            </div>
           </div>
         </div>
         <div className="col col-lg-7 card-body d-flex p-2">
@@ -55,7 +79,7 @@ export const ExperimentCard = ({
             <div>
               <ul className="d-flex align-items-start">
                 <ExperimentCardItem label="Creators" value={creators} />
-                <ExperimentCardItem label="Description" value={description} />
+                {/* <ExperimentCardItem label="Description" value={description} /> */}
               </ul>
               <ul className="d-flex align-items-start">
                 <ExperimentCardItem label="Version" value={version} />
@@ -64,15 +88,16 @@ export const ExperimentCard = ({
               </ul>
               <ul className="d-flex align-items-start">
                 <ExperimentCardItem label="Modalities" value={modalities} />
-                <ExperimentCardItem label="Primary Software" value={primarySoftware} />
-                <ExperimentCardItem label="Primary Function" value={primaryFunction} />
+                <ExperimentCardItem label="License" value={license} />
               </ul>
               <ul className="d-flex align-items-start">
                 <ExperimentCardItem label="DOI" value={doi} />
+                <ExperimentCardItem label="Primary Software" value={primarySoftware} />
+                <ExperimentCardItem label="Primary Function" value={primaryFunction} />
               </ul>
-              <ul className="d-flex align-items-start">
+              {/* <ul className="d-flex align-items-start">
                 <ExperimentCardItem label="License" value={license} />
-              </ul>
+              </ul> */}
             </div>
             <div className="py-1">
               <ul className="d-flex align-items-start">
@@ -82,17 +107,24 @@ export const ExperimentCard = ({
             </div>
           </div>
         </div>
-        <div className="col col-lg-3 p-2">
-          <div className="container-fluid d-flex flex-column justify-content-center h-100">
-            <div className="d-flex flex-column align-items-center my-2">
-              <i className="fa fa-eye fa-2x" aria-hidden="true"></i>
-              {views}
+        <div className="col col-lg-3 d-flex felx-column justify-content-center align-items-center p-2">
+          {/* <div className='row align-items-center w-100'>
+              <div className='col-10 p-0'>
+                <a className="btn btn-success m-1" role='button' href={downloadLink}>
+                  Download This Experiment
+                </a>
+              </div>
+          </div> */}
+            <div className="row align-items-center w-100">
+              <div className='col-10 p-0'>
+              <a className="btn btn-success mb-2" role='button' href={downloadLink}>
+                Download This Experiment
+              </a>
+              <a className="btn btn-success" role='button' href={source}>
+                View From {getPlatformFromUrl(source)}
+              </a>
+              </div>
             </div>
-            <div className="d-flex flex-column align-items-center">
-              <i className="fa fa-download fa-2x" aria-hidden="true"></i>
-              {downloads}
-            </div>
-          </div>
         </div>
       </div>
     </div>

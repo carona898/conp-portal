@@ -7,8 +7,10 @@ from flask import (
     url_for,
     send_from_directory,
     session,
+    make_response, 
+    Response,
     abort,
-    send_file
+    send_file,
 )
 
 from sqlalchemy import inspect
@@ -23,6 +25,10 @@ from .sort import SortKey
 from .utils import upload_file
 from .. import config, db
 from ..models import Experiment
+
+import os
+import io
+import zipfile
 
 def to_camel_case(snake_str: str):
     components = snake_str.split('_')
@@ -45,8 +51,8 @@ def experiment_as_dict(exp: Experiment):
         "primarySoftware": dats.software_requirements,
         "primaryFunction": dats.function_assessed,
         "doi": "",
-        "views": "",
-        "downloads": "",
+        "views": exp.views,
+        "downloads": exp.downloads,
         "imageFile": dats.LogoFilepath,
         "repositoryFileCount": dats.fileCount,
         "repositorySize": dats.size,
@@ -59,7 +65,8 @@ def experiment_as_dict(exp: Experiment):
         "otherSoftware": dats.software_requirements,
         "otherFunctions": dats.function_assessed,
         "acknowledgements": dats.acknowledges,
-        "source": dats.sources
+        "source": dats.sources,
+        "remoteUrl": exp.remoteUrl
     }
 
 @experiments_bp.route("/")
@@ -69,16 +76,53 @@ def home():
 @experiments_bp.route("/download/<int:experiment_id>")
 def download(experiment_id):
     experiment = Experiment.query.filter(Experiment.id == experiment_id).first_or_404()
-    experiment.increment_downloads()
-    return send_file(experiment.repository_file, mimetype='application/zip', as_attachment=True, attachment_filename='experiment')
+
+    # Mettre à jour le compteur de téléchargements
+    experiment.downloads = (experiment.downloads or 0) + 1
+
+    experiment_zip_path = experiment.fspath + ".zip"
+
+    # Vérifier si le fichier ZIP existe
+    if not os.path.exists(experiment_zip_path):
+        abort(404, description="Experiment ZIP file not found.")
+
+    db.session.commit()
+
+    # Télécharger le fichier ZIP
+    return send_file(experiment_zip_path, as_attachment=True, attachment_filename=os.path.basename(experiment_zip_path))
+
+    # return send_file(memory_file, mimetype='application/zip', as_attachment=True, attachment_filename='experiment.zip')
 
 @experiments_bp.route("/view/<int:experiment_id>")
 def view(experiment_id):
     experiment = Experiment.query.filter(Experiment.id == experiment_id).first_or_404()
-    return render_template(
-        "experiments/experiment.html",
-        experiment=experiment_as_dict(experiment)
-    )
+    readme_path = os.path.join(experiment.fspath, "README.md")
+    readme_content = ""
+
+    if os.path.exists(readme_path):
+        try:
+            with open(readme_path, 'r') as file:
+                readme_content = file.read()
+        except Exception as e:
+            print(e)  # Il est préférable de loguer l'exception plutôt que de passer silencieusement
+
+    readme_md = readme_content
+
+    # Préparez la réponse et rendez le template
+    resp = make_response(render_template("experiments/experiment.html",
+                                         experiment=experiment_as_dict(experiment),
+                                         readme=readme_md))
+
+    # Vérifiez si le cookie est déjà défini pour cet utilisateur et cette expérience spécifique
+    cookie_name = f'viewed_exp_{experiment_id}'
+    if not request.cookies.get(cookie_name):
+        # Si le cookie n'existe pas, incrémentez le compteur de vues et créez le cookie
+        experiment.views = (experiment.views or 0) + 1
+        db.session.commit()
+        # Définir le cookie pour une période, par exemple 24 heures (86400 secondes)
+        resp.set_cookie(cookie_name, 'true', max_age=86400)
+
+    return resp
 
 
 @experiments_bp.route("experiment_logo/<int:experiment_id>")
@@ -92,12 +136,20 @@ def get_experiment_logo(experiment_id):
 
 @experiments_bp.route("/search")
 def search():
+    # Récupérer le paramètre 'keyword' de l'URL, sinon None par défaut
+    keyword = request.args.get('keyword')
     experiments = Experiment.query.all()
     experiment_dict = [
         experiment_as_dict(exp) for exp in experiments
     ]
 
-    return render_template("experiments/search.html", experiments=experiment_dict)
+    # Si le paramètre keyword est vide (chaîne vide), vous pouvez le traiter comme non spécifié.
+    if not keyword:
+        return render_template("experiments/search.html", experiments=experiment_dict, keyword="")
+
+    return render_template("experiments/search.html", experiments=experiment_dict, keyword=keyword)
+
+
 
 
 @experiments_bp.route("/submit", methods=["GET", "POST"])

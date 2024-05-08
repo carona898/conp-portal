@@ -30,6 +30,10 @@ def upgrade():
     sa.Column('date_updated', sa.DateTime(), nullable=True),
     sa.Column('date_added_to_portal', sa.DateTime(), nullable=True),
     sa.Column('is_private', sa.Boolean(), nullable=True),
+    #ALEX count downloads
+    sa.Column('downloads', sa.Integer(), nullable=True),
+    #ALEX count views
+    sa.Column('views', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('experiments', schema=None) as batch_op:
