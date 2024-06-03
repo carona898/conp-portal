@@ -119,4 +119,3 @@ Werkzeug==0.16.1
 Whoosh==2.7.4
 wrapt==1.11.2
 WTForms==2.2.1
-zipp==3.15.0
