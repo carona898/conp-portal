@@ -70,6 +70,7 @@ const DataTable = ({
     const e = event.target.value;
     const filter = e.split(".");
     const newFilters = filters;
+    console.log('newFilters', newFilters)
     newFilters.forEach(f => {
       if (f.key === filter[0]) {
         if (f.values.includes(filter[1])) {
